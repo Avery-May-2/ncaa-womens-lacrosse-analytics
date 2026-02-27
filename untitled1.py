@@ -54,13 +54,10 @@ def scrape_stat_category(stat_id):
 assists_df = scrape_stat_category(480)
 assists_df.head(100)
 
-# Make sure column name matches exactly
 assists_df.columns = assists_df.columns.str.lower().str.replace(" ", "_")
 
-# Convert rank to numeric (blanks become NaN)
 assists_df["rank"] = pd.to_numeric(assists_df["rank"], errors="coerce")
 
-# Forward fill missing ranks
 assists_df["rank"] = assists_df["rank"].ffill()
 
 assists_df = assists_df.sort_values("rank")
@@ -110,16 +107,12 @@ for stat_name, df in all_stats.items():
     df = df[df["team"] != "Team"]
     df = df.dropna(subset=["team"])
 
-    # Drop rank column if it exists
     df = df.drop(columns=["rank"], errors="ignore")
 
-    # Identify stat column (usually last column)
     stat_column = df.columns[-1]
 
-    # Keep only team + stat
     df = df[["team", stat_column]]
 
-    # Rename stat column to stat_name
     df = df.rename(columns={stat_column: stat_name})
 
     cleaned_stats[stat_name] = df
@@ -149,15 +142,12 @@ for stat_name, df in all_stats.items():
     df = df[df["team"] != "Team"]
     df = df.dropna(subset=["team"])
 
-    # Save GP only once
     if "games" in df.columns and games_df is None:
         games_df = df[["team", "games"]].copy()
         games_df = games_df.rename(columns={"games": "games_played"})
 
-    # Drop rank and gp from stat tables
     df = df.drop(columns=["rank", "games"], errors="ignore")
 
-    # Identify stat column (usually last column)
     stat_column = df.columns[-1]
 
     df = df[["team", stat_column]]
